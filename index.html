@@ -3,302 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedResidency Tracker - VUNESP</title>
+    <title>MedResidency UNESP Premium</title>
     <!-- Fontes e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         /* ==========================================
-           1. CSS VARIABLES (Paleta Médica)
+           1. CSS VARIABLES (Premium Dark Mode)
            ========================================== */
         :root {
-            --primary: #2b6cb0;     
-            --primary-light: #ebf8ff;
-            --primary-dark: #2c5282;
-            --secondary: #4299e1;   
-            --accent: #3182ce;
-            --bg-color: #f7fafc;    
-            --surface: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --success: #38a169;
-            --success-light: #c6f6d5;
-            --warning: #dd6b20;
-            --warning-bg: #feebc8;
-            --danger: #e53e3e;
-            --border: #e2e8f0;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --bg-base: #0f172a;        /* Slate 900 */
+            --bg-surface: #1e293b;     /* Slate 800 */
+            --bg-elevated: #334155;    /* Slate 700 */
+            --primary: #3b82f6;        /* Blue 500 */
+            --primary-hover: #2563eb;
+            --accent: #10b981;         /* Emerald 500 */
+            --text-main: #f8fafc;      /* Slate 50 */
+            --text-muted: #94a3b8;     /* Slate 400 */
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #334155;
+            --radius: 14px;
+            --shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
         }
 
         /* ==========================================
-           2. RESET & BASE
+           2. BASE & RESET
            ========================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; padding-bottom: 80px; }
-        
+        body { background-color: var(--bg-base); color: var(--text-main); line-height: 1.6; padding-bottom: 90px; }
         .app-container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
         /* ==========================================
-           3. UI COMPONENTS
+           3. COMPONENTS
            ========================================== */
+        /* Header */
         .header { margin-bottom: 24px; text-align: center; }
-        .header h1 { font-size: 1.5rem; color: var(--primary-dark); font-weight: 700; margin-bottom: 4px; }
-        .header p { font-size: 0.875rem; color: var(--text-muted); }
-        
-        .progress-container { background: var(--border); border-radius: 999px; height: 12px; overflow: hidden; margin-top: 16px; }
-        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.4s ease; }
-        .progress-text { font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 4px; display: block; }
+        .header h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { font-size: 0.85rem; color: var(--text-muted); }
 
-        .alert-card { background: var(--warning-bg); border-left: 4px solid var(--warning); padding: 16px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; }
-        .alert-card i { color: var(--warning); font-size: 1.25rem; }
-        .alert-card.active { display: flex; animation: slideDown 0.3s ease; }
-
-        .tabs { display: flex; background: var(--surface); border-radius: var(--radius); padding: 4px; margin-bottom: 24px; box-shadow: var(--shadow); }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 500; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.875rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .tab-btn.active { background: var(--primary-light); color: var(--primary-dark); }
-        
+        /* Tabs Nav */
+        .tabs { display: flex; background: var(--bg-surface); border-radius: var(--radius); padding: 6px; margin-bottom: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow-x: auto;}
+        .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: transparent; font-weight: 500; color: var(--text-muted); border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .tab-btn i { font-size: 1.1rem; }
+        .tab-btn.active { background: var(--bg-elevated); color: var(--primary); }
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
 
-        .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
-        .card-title { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+        /* Cards Gerais */
+        .card { background: var(--bg-surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
+        .card-title { font-size: 1.05rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
 
-        /* Edital Accordion */
+        /* Dashboard & Charts */
+        .chart-container { position: relative; height: 200px; width: 100%; margin: 0 auto 20px auto; display: flex; justify-content: center; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .stat-box { background: var(--bg-elevated); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border);}
+        .stat-box h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-box .val { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 4px; }
+        .stat-box .val.success { color: var(--accent); }
+        .stat-box .val.warning { color: var(--warning); }
+        .stat-box .val.danger { color: var(--danger); }
+
+        /* Accordion Edital */
         .accordion-item { border-bottom: 1px solid var(--border); }
         .accordion-item:last-child { border-bottom: none; }
-        .accordion-header { padding: 16px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--primary-dark); }
+        .accordion-header { padding: 16px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--text-main); }
         .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-        .accordion-item.active .accordion-body { max-height: 2000px; margin-bottom: 16px; }
+        .accordion-item.active .accordion-body { max-height: 3000px; margin-bottom: 16px; }
         .accordion-item.active .accordion-header i { transform: rotate(180deg); }
-        
-        /* Lista de Temas */
+
+        /* Topic List */
         .topic-list { list-style: none; }
-        .topic-item { display: flex; align-items: center; padding: 12px 0; border-top: 1px dashed var(--border); gap: 12px; }
+        .topic-item { padding: 12px 0; border-top: 1px dashed var(--border); cursor: pointer; transition: 0.2s;}
         .topic-item:first-child { border-top: none; }
-        .checkbox-custom { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-        .checkbox-custom.checked { background: var(--success); border-color: var(--success); }
-        .checkbox-custom.checked i { display: block; color: white; font-size: 12px; }
-        .checkbox-custom i { display: none; }
-        .topic-name { font-size: 0.90rem; flex: 1; transition: 0.2s; }
+        .topic-main { display: flex; align-items: center; gap: 12px; }
+        
+        .checkbox-custom { width: 22px; height: 22px; border: 2px solid var(--text-muted); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .topic-item.completed .checkbox-custom { background: var(--accent); border-color: var(--accent); }
+        .topic-item.completed .checkbox-custom::after { content: '\f00c'; font-family: 'FontAwesome'; color: var(--bg-base); font-size: 12px; }
+        
+        .topic-name { font-size: 0.9rem; flex: 1; color: var(--text-main); }
         .topic-item.completed .topic-name { text-decoration: line-through; color: var(--text-muted); }
+        .badge-top20 { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.5); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;}
 
         /* Timers */
-        .timer-card { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; gap: 12px; }
-        .timer-header { display: flex; justify-content: space-between; width: 100%; align-items: center; font-weight: 600; color: var(--primary-dark); }
-        .timer-badge { background: var(--primary-light); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-        .timer-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-main); margin: 8px 0; }
-        .btn-play { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-play:hover { background: var(--primary-dark); }
-        .btn-play.active { background: var(--warning); }
-        
-        /* Calendário (Timeline de Próximas Revisões) */
-        .timeline-item { display: flex; gap: 16px; margin-bottom: 16px; position: relative; }
-        .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-date-box { background: var(--primary-light); color: var(--primary-dark); border-radius: 8px; padding: 8px; min-width: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--border); }
-        .timeline-date-box .day { font-size: 1.25rem; font-weight: 700; line-height: 1; margin-bottom: 2px;}
-        .timeline-date-box .month { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
-        .timeline-content { flex: 1; background: var(--bg-color); padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-        .timeline-content h4 { font-size: 0.85rem; color: var(--text-main); margin-bottom: 4px; }
-        .timeline-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; background: var(--success-light); color: var(--success); margin-bottom: 4px;}
-        .timeline-badge.warning { background: var(--warning-bg); color: var(--warning); }
-        .countdown-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-top: 4px; display: block; }
+        .timer-card { background: var(--bg-elevated); border-radius: 12px; padding: 16px; margin-bottom: 12px; text-align: center; border: 1px solid var(--border); }
+        .timer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;}
+        .timer-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 8px 0; color: var(--text-main); }
+        .btn-play { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s;}
+        .btn-play.active { background: var(--warning); color: var(--bg-base); }
 
-        /* Review Buckets (SRS) */
-        .review-bucket { margin-bottom: 24px; }
-        .review-bucket h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--primary-light); padding-bottom: 4px; }
-        .empty-state { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 12px; font-style: italic; }
+        /* Modal (Active Recall & Performance) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-card { background: var(--bg-surface); padding: 24px; border-radius: var(--radius); width: 100%; max-width: 400px; border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .modal-card h3 { margin-bottom: 16px; font-size: 1.1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 8px;}
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); }
+        .input-row { display: flex; gap: 12px; }
+        .input-row input { flex: 1; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-main); padding: 10px; border-radius: 8px; text-align: center; font-size: 1.1rem; font-weight: 600;}
+        textarea { width: 100%; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-main); padding: 12px; border-radius: 8px; min-height: 80px; resize: none; font-size: 0.85rem; }
+        .btn-save { background: var(--accent); color: var(--bg-base); border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 8px; font-size: 1rem;}
+        .btn-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 10px; border-radius: 8px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 8px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Active Recall Alert */
+        .recall-alert { margin-top: 12px; background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--warning); padding: 12px; border-radius: 0 8px 8px 0; }
+        .recall-alert strong { color: var(--warning); font-size: 0.8rem; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .recall-alert p { font-size: 0.85rem; color: var(--text-main); font-style: italic; }
+
+        .empty-state { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.9rem; font-style: italic;}
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     
-    <!-- Cabeçalho & Barra de Progresso -->
     <header class="header">
-        <h1>MedResidency VUNESP</h1>
-        <p>Protocolo Ouro de Estudos: 20/30/50</p>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <span class="progress-text" id="progressText">0% Concluído</span>
+        <h1>UNESP Tracker Pro</h1>
+        <p>Dashboard Analítico & SRS Adaptativo</p>
     </header>
-
-    <!-- Alerta de Revisão para Hoje (SRS) -->
-    <div class="alert-card" id="reviewAlert">
-        <i class="fa-solid fa-bell"></i>
-        <div>
-            <strong style="color: var(--text-main); display: block;">Revisões Pendentes</strong>
-            <span style="font-size: 0.875rem;" id="reviewAlertText">Você tem temas para revisar hoje.</span>
-        </div>
-    </div>
 
     <!-- Navegação / Abas -->
     <nav class="tabs">
-        <button class="tab-btn active" onclick="switchTab('home')">
-            <i class="fa-solid fa-house"></i> Início
-        </button>
-        <button class="tab-btn" onclick="switchTab('syllabus')">
-            <i class="fa-solid fa-list-check"></i> Edital
-        </button>
-        <button class="tab-btn" onclick="switchTab('srs')">
-            <i class="fa-solid fa-calendar-check"></i> Revisões Hoje
-        </button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Painel</button>
+        <button class="tab-btn" onclick="switchTab('session')"><i class="fa-solid fa-stopwatch"></i> Sessão</button>
+        <button class="tab-btn" onclick="switchTab('syllabus')"><i class="fa-solid fa-list-check"></i> Edital</button>
+        <button class="tab-btn" onclick="switchTab('srs')"><i class="fa-solid fa-brain"></i> Revisões</button>
     </nav>
 
-    <!-- ABA 1: INÍCIO (Calendário Dinâmico + Sessão de Estudo) -->
-    <main class="tab-content active" id="tab-home">
-        
-        <!-- Novo Calendário de Próximas Revisões -->
-        <div class="card" id="calendar-card">
-            <h2 class="card-title"><i class="fa-solid fa-calendar-days"></i> Calendário de Próximas Revisões</h2>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; text-align: justify;">
-                Ao marcar um tema como concluído no <strong>Edital</strong>, suas próximas revisões (1, 7, 15 e 30 dias) são agendadas e aparecerão automaticamente aqui.
+    <!-- ABA 1: DASHBOARD (Performance) -->
+    <main class="tab-content active" id="tab-dashboard">
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-chart-line"></i> Distribuição de Estudo</h2>
+            <div class="chart-container">
+                <canvas id="studyChart"></canvas>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                O gráfico atualiza em tempo real enquanto os cronômetros da aba "Sessão" estão ativos.
             </p>
-            <div id="upcoming-revisions-list">
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-bullseye"></i> Taxa de Acerto por Eixo</h2>
+            <div class="stats-grid" id="performance-grid">
                 <!-- Preenchido via JS -->
             </div>
         </div>
+    </main>
 
-        <h2 class="card-title" style="margin-top: 24px; border:none;"><i class="fa-solid fa-stopwatch"></i> Cronômetros da Sessão</h2>
-        
-        <!-- Timer Revisão -->
-        <div class="timer-card">
-            <div class="timer-header">
-                <span>1. Revisão Ativa (Flashcards/Resumos)</span>
-                <span class="timer-badge">20%</span>
-            </div>
-            <div class="timer-display" id="display-review">24:00</div>
-            <button class="btn-play" id="btn-review" onclick="toggleTimer('review', 24)">
-                <i class="fa-solid fa-play"></i> Iniciar
-            </button>
-        </div>
+    <!-- ABA 2: SESSÃO (Timers integrados ao Gráfico) -->
+    <main class="tab-content" id="tab-session">
+        <div class="card">
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: justify; margin-bottom: 16px;">
+                Inicie o cronômetro correspondente. O tempo gasto será registrado automaticamente no seu Gráfico de Distribuição no Painel.
+            </p>
 
-        <!-- Timer Teoria -->
-        <div class="timer-card">
-            <div class="timer-header">
-                <span>2. Consumo de Teoria (Aulas)</span>
-                <span class="timer-badge">30%</span>
+            <div class="timer-card">
+                <div class="timer-header">
+                    <span style="color: var(--warning);"><i class="fa-solid fa-rotate"></i> Revisão Ativa</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Meta: 20%</span>
+                </div>
+                <div class="timer-display" id="display-review">24:00</div>
+                <button class="btn-play" id="btn-review" onclick="toggleTimer('review', 24)">
+                    <i class="fa-solid fa-play"></i> Iniciar
+                </button>
             </div>
-            <div class="timer-display" id="display-theory">36:00</div>
-            <button class="btn-play" id="btn-theory" onclick="toggleTimer('theory', 36)">
-                <i class="fa-solid fa-play"></i> Iniciar
-            </button>
-        </div>
 
-        <!-- Timer Questões -->
-        <div class="timer-card">
-            <div class="timer-header">
-                <span>3. Resolução de Questões</span>
-                <span class="timer-badge">50%</span>
+            <div class="timer-card">
+                <div class="timer-header">
+                    <span style="color: var(--primary);"><i class="fa-solid fa-book-open"></i> Teoria (Aulas/Resumos)</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Meta: 30%</span>
+                </div>
+                <div class="timer-display" id="display-theory">36:00</div>
+                <button class="btn-play" id="btn-theory" onclick="toggleTimer('theory', 36)">
+                    <i class="fa-solid fa-play"></i> Iniciar
+                </button>
             </div>
-            <div class="timer-display" id="display-questions">60:00</div>
-            <button class="btn-play" id="btn-questions" onclick="toggleTimer('questions', 60)">
-                <i class="fa-solid fa-play"></i> Iniciar
-            </button>
+
+            <div class="timer-card">
+                <div class="timer-header">
+                    <span style="color: var(--accent);"><i class="fa-solid fa-pen-to-square"></i> Questões VUNESP</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Meta: 50%</span>
+                </div>
+                <div class="timer-display" id="display-questions">60:00</div>
+                <button class="btn-play" id="btn-questions" onclick="toggleTimer('questions', 60)">
+                    <i class="fa-solid fa-play"></i> Iniciar
+                </button>
+            </div>
         </div>
     </main>
 
-    <!-- ABA 2: Edital & Progressão (Accordion) -->
+    <!-- ABA 3: EDITAL (Sequência UNESP c/ Algoritmo) -->
     <main class="tab-content" id="tab-syllabus">
         <div class="card">
-            <div id="accordion-container">
-                <!-- Preenchido via JS -->
-            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: justify; margin-bottom: 16px;">
+                Sequência estratégica otimizada para a prova da <strong>UNESP</strong>. Temas marcados com <span class="badge-top20">TOP 20</span> ativam o <em>Algoritmo de Priorização</em> (< 70% acerto = Revisão em 3 dias).
+            </p>
+            <div id="accordion-container"></div>
         </div>
     </main>
 
-    <!-- ABA 3: Revisões Programadas para HOJE (SRS) -->
+    <!-- ABA 4: REVISÕES (SRS + Active Recall) -->
     <main class="tab-content" id="tab-srs">
-        <div class="card" style="margin-bottom: 12px;">
-            <p style="font-size: 0.875rem; color: var(--text-muted);">
-                A curva de esquecimento exige revisões em <strong>1, 7, 15 e 30 dias</strong>.
-                Aqui estão apenas os tópicos que caíram exatamente na janela de revisão de <strong>HOJE</strong>.
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-calendar-check"></i> Revisões Programadas</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Lista baseada na curva de esquecimento adaptativa (1, 7, 15, 30 dias) e nas suas taxas de acerto.
             </p>
-        </div>
-
-        <div id="srs-container" class="card">
-            <!-- Preenchido via JS -->
+            <div id="srs-container"></div>
         </div>
     </main>
 
 </div>
 
+<!-- MODAL DE CONCLUSÃO (Performance & Active Recall) -->
+<div class="modal-overlay" id="completionModal">
+    <div class="modal-card">
+        <h3 id="modalTopicTitle">Concluir Tema</h3>
+        
+        <div class="form-group">
+            <label><i class="fa-solid fa-bullseye"></i> Desempenho nas Questões:</label>
+            <div class="input-row">
+                <input type="number" id="inputTotalQ" placeholder="Total Feitas" min="1">
+                <input type="number" id="inputCorrectQ" placeholder="Acertos" min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-brain"></i> Active Recall (Análise de Erro):</label>
+            <textarea id="inputErrorNote" placeholder="Qual foi o seu maior erro ou aprendizado hoje sobre este tema? (Ex: Esqueci o sinal de Murphy na colecistite...)"></textarea>
+            <p style="font-size: 0.7rem; color: var(--warning); margin-top: 4px;">Isso aparecerá como alerta na sua próxima revisão!</p>
+        </div>
+
+        <button class="btn-save" onclick="saveTopicCompletion()">Salvar e Concluir</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+</div>
+
 <!-- ==========================================
-     LÓGICA JAVASCRIPT
+     LÓGICA JAVASCRIPT (Algoritmo UNESP)
      ========================================== -->
 <script>
-    /* --- 1. CONFIGURAÇÃO E DADOS --- */
-    
-    // Simulação de datas para popular o calendário de exemplo
-    const getDaysAgo = (days) => {
-        const d = new Date();
-        d.setDate(d.getDate() - days);
-        return d.getTime();
-    }
+    /* --- 1. DADOS E SEQUÊNCIA UNESP --- */
+    // Ordem exata: Gastro -> APS -> Urgência -> G.O -> Pediatria -> Clínica Médica
+    const unespCurriculum =[
+        // 1. Gastroclínica e Cirurgia Geral
+        { id: 1, axis: 'Gastro/Cirurgia', name: 'Doença Calculosa Biliar (Colecistite)', isTop20: true },
+        { id: 2, axis: 'Gastro/Cirurgia', name: 'Trauma Abdominal (ATLS 10ª Ed)', isTop20: true },
+        { id: 3, axis: 'Gastro/Cirurgia', name: 'Hérnias da Parede Abdominal', isTop20: true },
+        { id: 4, axis: 'Gastro/Cirurgia', name: 'Pancreatite Aguda (Ranson/Atlanta)', isTop20: true },
+        { id: 5, axis: 'Gastro/Cirurgia', name: 'Apendicite Aguda', isTop20: true },
+        { id: 6, axis: 'Gastro/Cirurgia', name: 'Doença Diverticular', isTop20: false },
+        
+        // 2. APS e Preventiva
+        { id: 7, axis: 'APS/Preventiva', name: 'Princípios do SUS e Políticas Públicas', isTop20: true },
+        { id: 8, axis: 'APS/Preventiva', name: 'Indicadores de Saúde (Mortalidade)', isTop20: true },
+        { id: 9, axis: 'APS/Preventiva', name: 'Estudos Epidemiológicos', isTop20: true },
+        { id: 10, axis: 'APS/Preventiva', name: 'Medicina de Família (Atributos da APS)', isTop20: true },
+        { id: 11, axis: 'APS/Preventiva', name: 'Saúde do Trabalhador', isTop20: false },
 
-    const defaultTopics =[
-        // Eixo: Clínica Médica
-        { id: 1, axis: 'Clínica Médica', name: 'Cardiologia: HAS (Diretriz Brasileira)', completed: false, completedAt: null },
-        { id: 2, axis: 'Clínica Médica', name: 'Cardiologia: ICC (Frações de ejeção e manejo)', completed: false, completedAt: null },
-        { id: 3, axis: 'Clínica Médica', name: 'Cardiologia: DAC estável e SCA (com e sem supra)', completed: false, completedAt: null },
-        { id: 4, axis: 'Clínica Médica', name: 'Endocrinologia: Diabetes Mellitus (Diagnóstico, manejo insulina, CAD)', completed: false, completedAt: null },
-        { id: 5, axis: 'Clínica Médica', name: 'Endocrinologia: Tireoide (Nódulos e Hipotiroidismo)', completed: false, completedAt: null },
-        { id: 6, axis: 'Clínica Médica', name: 'Nefrologia: Injúria Renal Aguda (KDIGO)', completed: false, completedAt: null },
-        { id: 7, axis: 'Clínica Médica', name: 'Nefrologia: Distúrbios Hidroeletrolíticos e Ácido-Básicos', completed: false, completedAt: null },
-        { id: 8, axis: 'Clínica Médica', name: 'Infectologia: Dengue (Manejo grupos A/B/C/D)', completed: false, completedAt: null },
-        { id: 9, axis: 'Clínica Médica', name: 'Infectologia: HIV/AIDS (PEP, PrEP e infecções oportunistas)', completed: false, completedAt: null },
-        { id: 10, axis: 'Clínica Médica', name: 'Infectologia: Antibioticoterapia comunitária', completed: false, completedAt: null },
+        // 3. Urgência e Emergência
+        { id: 12, axis: 'Urgência e Emergência', name: 'ACLS e Parada Cardiorrespiratória', isTop20: true },
+        { id: 13, axis: 'Urgência e Emergência', name: 'Sepse 3.0 (qSOFA e Manejo 1ª hora)', isTop20: true },
+        { id: 14, axis: 'Urgência e Emergência', name: 'Intoxicações Exógenas', isTop20: false },
 
-        // Eixo: Cirurgia Geral
-        { id: 11, axis: 'Cirurgia Geral', name: 'Gastro: Doença Calculosa Biliar (Colelitíase, Colecistite, Coledocolitíase)', completed: false, completedAt: null },
-        { id: 12, axis: 'Cirurgia Geral', name: 'Gastro: Pancreatite Aguda (Critérios Ranson/Atlanta)', completed: false, completedAt: null },
-        { id: 13, axis: 'Cirurgia Geral', name: 'Gastro: Doença Diverticular e Apendicite Aguda', completed: false, completedAt: null },
-        { id: 14, axis: 'Cirurgia Geral', name: 'Trauma: Avaliação primária e secundária (ATLS 10ª Ed.)', completed: false, completedAt: null },
-        { id: 15, axis: 'Cirurgia Geral', name: 'Trauma: Abdominal (indicação laparotomia) e Torácico (Pneumo/Hemotórax)', completed: false, completedAt: null },
-        { id: 16, axis: 'Cirurgia Geral', name: 'Urologia: Litíase urinária e HPB', completed: false, completedAt: null },
-        { id: 17, axis: 'Cirurgia Geral', name: 'Hérnias: Classificação de Nyhus e técnica cirúrgica', completed: false, completedAt: null },
+        // 4. Ginecologia e Obstetrícia
+        { id: 15, axis: 'Ginecologia e Obstetrícia', name: 'Sangramentos da Gestação (DPP, PP, Aborto)', isTop20: true },
+        { id: 16, axis: 'Ginecologia e Obstetrícia', name: 'DHEG (Pré-Eclâmpsia)', isTop20: true },
+        { id: 17, axis: 'Ginecologia e Obstetrícia', name: 'Rastreamento Câncer de Colo e Mama', isTop20: true },
+        { id: 18, axis: 'Ginecologia e Obstetrícia', name: 'Assistência Pré-Natal', isTop20: false },
+        { id: 19, axis: 'Ginecologia e Obstetrícia', name: 'Ciclo Menstrual e SOP', isTop20: false },
 
-        // Eixo: Preventiva e APS
-        // MOCK: Estudado hoje -> Para mostrar agendamento de 1 dia no calendário
-        { id: 18, axis: 'Atenção Primária / Preventiva', name: 'Políticas: Princípios do SUS, PNH e RAS', completed: true, completedAt: getDaysAgo(0) }, 
-        { id: 19, axis: 'Atenção Primária / Preventiva', name: 'Medicina de Família: Atributos APS e Método Clínico', completed: false, completedAt: null },
-        { id: 20, axis: 'Atenção Primária / Preventiva', name: 'Epidemiologia: Indicadores de Saúde (Mortalidade, Letalidade)', completed: false, completedAt: null },
-        // MOCK: Estudado há 4 dias -> Faltam 3 dias para a revisão de 7 dias
-        { id: 21, axis: 'Atenção Primária / Preventiva', name: 'Epidemiologia: Estudos Epidemiológicos e Bioestatística', completed: true, completedAt: getDaysAgo(4) },
-        { id: 22, axis: 'Atenção Primária / Preventiva', name: 'Saúde do Trabalhador: Notificações de acidentes e doenças ocupacionais', completed: false, completedAt: null },
+        // 5. Pediatria
+        { id: 20, axis: 'Pediatria', name: 'Calendário de Imunização (PNI)', isTop20: true },
+        { id: 21, axis: 'Pediatria', name: 'Doenças Exantemáticas', isTop20: true },
+        { id: 22, axis: 'Pediatria', name: 'IVAS, OMA e Pneumonia', isTop20: true },
+        { id: 23, axis: 'Pediatria', name: 'Puericultura e Aleitamento', isTop20: false },
 
-        // Eixo: Ginecologia e Obstetrícia
-        { id: 23, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Pré-natal (Ministério da Saúde)', completed: false, completedAt: null },
-        { id: 24, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Sangramentos da 1ª e 2ª metade', completed: false, completedAt: null },
-        { id: 25, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Doença Hipertensiva da Gravidez (Pré-eclâmpsia)', completed: false, completedAt: null },
-        { id: 26, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Ciclo Menstrual e SOP', completed: false, completedAt: null },
-        { id: 27, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Climatério', completed: false, completedAt: null },
-        { id: 28, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Câncer de Colo e Câncer de Mama', completed: false, completedAt: null },
-
-        // Eixo: Pediatria
-        { id: 29, axis: 'Pediatria', name: 'Puericultura: Crescimento, Desenvolvimento e Aleitamento', completed: false, completedAt: null },
-        { id: 30, axis: 'Pediatria', name: 'Imunização: Calendário PNI atualizado', completed: false, completedAt: null },
-        // MOCK: Estudado há 7 dias -> Cai HOJE na revisão SRS
-        { id: 31, axis: 'Pediatria', name: 'Doenças: Infecções de vias aéreas (IVAS, OMA, Sinusite)', completed: true, completedAt: getDaysAgo(7) }, 
-        // MOCK: Estudado há 12 dias -> Faltam 3 dias para a revisão de 15 dias
-        { id: 32, axis: 'Pediatria', name: 'Doenças: Diarreia e Desidratação', completed: true, completedAt: getDaysAgo(12) },
-        { id: 33, axis: 'Pediatria', name: 'Doenças: Doenças Exantemáticas', completed: false, completedAt: null },
-
-        // Eixo: Urgência e Emergência
-        { id: 34, axis: 'Urgência e Emergência', name: 'Suporte de Vida: ACLS (Ritmos) e Via Aérea Difícil', completed: false, completedAt: null },
-        { id: 35, axis: 'Urgência e Emergência', name: 'Sepse: Protocolo Sepse 3 (qSOFA)', completed: false, completedAt: null }
+        // 6. Clínica Médica
+        { id: 24, axis: 'Clínica Médica', name: 'Cardiologia: HAS e ICC', isTop20: true },
+        { id: 25, axis: 'Clínica Médica', name: 'Endocrino: Diabetes Mellitus e CAD', isTop20: true },
+        { id: 26, axis: 'Clínica Médica', name: 'ECG e Arritmias', isTop20: true },
+        { id: 27, axis: 'Clínica Médica', name: 'Infectologia: Dengue e Arboviroses', isTop20: true },
+        { id: 28, axis: 'Clínica Médica', name: 'Nefrologia: Injúria Renal Aguda', isTop20: false }
     ];
 
-    let appData = { topics:[] };
+    // Formata o array para incluir os dados dinâmicos
+    const defaultTopics = unespCurriculum.map(t => ({
+        ...t, completed: false, completedAt: null, totalQ: 0, correctQ: 0, score: 0, errorNote: ''
+    }));
 
-    /* --- 2. INICIALIZAÇÃO E PERSISTÊNCIA (LocalStorage v3) --- */
+    let appData = {
+        topics:[],
+        timeStats: { review: 0, theory: 0, questions: 0 } // Segundos totais
+    };
+
+    let chartInstance = null;
+    let currentTopicEditing = null;
+
+    /* --- 2. INICIALIZAÇÃO E PERSISTÊNCIA --- */
     function init() {
-        const stored = localStorage.getItem('medResidencyVunesp_v3');
+        const stored = localStorage.getItem('medResidencyUNESP_v4');
         if (stored) {
             appData = JSON.parse(stored);
         } else {
@@ -306,17 +317,17 @@
             saveData();
         }
 
-        renderProgress();
+        initChart();
+        renderDashboard();
         renderSyllabus();
-        renderUpcomingCalendar();
-        renderSRSToday();
+        renderSRS();
     }
 
     function saveData() {
-        localStorage.setItem('medResidencyVunesp_v3', JSON.stringify(appData));
+        localStorage.setItem('medResidencyUNESP_v4', JSON.stringify(appData));
     }
 
-    /* --- 3. NAVEGAÇÃO DE ABAS --- */
+    /* --- 3. NAVEGAÇÃO --- */
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -325,22 +336,85 @@
         document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    /* --- 4. RENDERIZAÇÃO PROGRESSO --- */
-    function renderProgress() {
-        const total = appData.topics.length;
-        const completed = appData.topics.filter(t => t.completed).length;
-        const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+    /* --- 4. DASHBOARD E CHART.JS --- */
+    function initChart() {
+        const ctx = document.getElementById('studyChart').getContext('2d');
         
-        document.getElementById('progressBar').style.width = percentage + '%';
-        document.getElementById('progressText').innerText = `${percentage}% do Edital Concluído`;
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter';
+
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Revisão', 'Teoria', 'Questões'],
+                datasets: [{
+                    data:[
+                        Math.max(1, appData.timeStats.review), 
+                        Math.max(1, appData.timeStats.theory), 
+                        Math.max(1, appData.timeStats.questions)
+                    ],
+                    backgroundColor:['#f59e0b', '#3b82f6', '#10b981'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+                }
+            }
+        });
     }
 
-    /* --- 5. RENDERIZAÇÃO EDITAL (Accordion) --- */
+    function updateChart() {
+        if (!chartInstance) return;
+        chartInstance.data.datasets[0].data =[
+            appData.timeStats.review || 1, 
+            appData.timeStats.theory || 1, 
+            appData.timeStats.questions || 1
+        ];
+        chartInstance.update();
+    }
+
+    function renderDashboard() {
+        const grid = document.getElementById('performance-grid');
+        grid.innerHTML = '';
+        
+        const axes =[...new Set(appData.topics.map(t => t.axis))];
+
+        axes.forEach(axis => {
+            const axisTopics = appData.topics.filter(t => t.axis === axis && t.completed);
+            
+            let totalQ = 0, correctQ = 0;
+            axisTopics.forEach(t => { totalQ += t.totalQ; correctQ += t.correctQ; });
+            
+            let percentage = totalQ > 0 ? Math.round((correctQ / totalQ) * 100) : 0;
+            
+            let colorClass = 'val';
+            if (totalQ > 0) {
+                if(percentage >= 80) colorClass += ' success';
+                else if(percentage < 70) colorClass += ' danger';
+                else colorClass += ' warning';
+            }
+
+            grid.innerHTML += `
+                <div class="stat-box">
+                    <h4>${axis}</h4>
+                    <div class="${colorClass}">${totalQ > 0 ? percentage + '%' : '--'}</div>
+                </div>
+            `;
+        });
+    }
+
+    /* --- 5. EDITAL E MODAL (Active Recall) --- */
     function renderSyllabus() {
         const container = document.getElementById('accordion-container');
         container.innerHTML = '';
 
-        const axes =[...new Set(appData.topics.map(t => t.axis))];
+        const axes = [...new Set(appData.topics.map(t => t.axis))];
 
         axes.forEach(axis => {
             const axisTopics = appData.topics.filter(t => t.axis === axis);
@@ -349,18 +423,24 @@
             const div = document.createElement('div');
             div.className = 'accordion-item';
             div.innerHTML = `
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span>${axis} <small style="color:var(--text-muted); font-weight:normal; margin-left:8px;">(${completedCount}/${axisTopics.length})</small></span>
+                <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>${axis} <span style="color:var(--text-muted); font-size: 0.8rem; margin-left:8px;">(${completedCount}/${axisTopics.length})</span></span>
                     <i class="fa-solid fa-chevron-down" style="transition:0.3s"></i>
                 </div>
                 <div class="accordion-body">
                     <ul class="topic-list">
                         ${axisTopics.map(t => `
-                            <li class="topic-item ${t.completed ? 'completed' : ''}" onclick="toggleTopic(${t.id})">
-                                <div class="checkbox-custom ${t.completed ? 'checked' : ''}">
-                                    <i class="fa-solid fa-check"></i>
+                            <li class="topic-item ${t.completed ? 'completed' : ''}" onclick="handleTopicClick(${t.id})">
+                                <div class="topic-main">
+                                    <div class="checkbox-custom"></div>
+                                    <span class="topic-name">${t.name}</span>
+                                    ${t.isTop20 ? '<span class="badge-top20">TOP 20</span>' : ''}
                                 </div>
-                                <span class="topic-name">${t.name}</span>
+                                ${t.completed && t.totalQ > 0 ? `
+                                    <div style="margin-top: 8px; margin-left: 34px; font-size: 0.75rem; color: var(--text-muted);">
+                                        <i class="fa-solid fa-chart-simple"></i> Acerto: <strong>${t.score}%</strong> (${t.correctQ}/${t.totalQ})
+                                    </div>
+                                ` : ''}
                             </li>
                         `).join('')}
                     </ul>
@@ -370,183 +450,139 @@
         });
     }
 
-    function toggleAccordion(element) {
-        const parent = element.parentElement;
-        parent.classList.toggle('active');
-    }
-
-    /* FUNÇÃO PRINCIPAL: MARCAR COMO CONCLUÍDO (Trigger do Calendário) */
-    function toggleTopic(id) {
+    function handleTopicClick(id) {
         const topic = appData.topics.find(t => t.id === id);
-        topic.completed = !topic.completed;
-        topic.completedAt = topic.completed ? new Date().getTime() : null;
         
-        saveData();
-        renderProgress();
-        renderSyllabus(); 
-        renderUpcomingCalendar(); // Atualiza o Calendário na Home
-        renderSRSToday();         // Atualiza Alertas de Hoje
+        // Se já está completo, desmarca direto sem abrir modal
+        if (topic.completed) {
+            topic.completed = false;
+            topic.completedAt = null;
+            saveData();
+            renderSyllabus();
+            renderDashboard();
+            renderSRS();
+            return;
+        }
+
+        // Abrir Modal para preencher dados
+        currentTopicEditing = topic;
+        document.getElementById('modalTopicTitle').innerText = topic.name;
+        document.getElementById('inputTotalQ').value = '';
+        document.getElementById('inputCorrectQ').value = '';
+        document.getElementById('inputErrorNote').value = '';
+        document.getElementById('completionModal').classList.add('active');
     }
 
-    /* --- 6. NOVO: CALENDÁRIO DE PRÓXIMAS REVISÕES (Home Tab) --- */
-    function renderUpcomingCalendar() {
-        const listContainer = document.getElementById('upcoming-revisions-list');
-        listContainer.innerHTML = '';
-        
-        let upcoming =[];
+    function closeModal() {
+        document.getElementById('completionModal').classList.remove('active');
+        currentTopicEditing = null;
+    }
+
+    function saveTopicCompletion() {
+        if (!currentTopicEditing) return;
+
+        const totalQ = parseInt(document.getElementById('inputTotalQ').value) || 0;
+        const correctQ = parseInt(document.getElementById('inputCorrectQ').value) || 0;
+        const errorNote = document.getElementById('inputErrorNote').value.trim();
+
+        if (totalQ > 0 && correctQ > totalQ) {
+            alert("O número de acertos não pode ser maior que o total de questões!");
+            return;
+        }
+
+        currentTopicEditing.completed = true;
+        currentTopicEditing.completedAt = new Date().getTime();
+        currentTopicEditing.totalQ = totalQ;
+        currentTopicEditing.correctQ = correctQ;
+        currentTopicEditing.score = totalQ > 0 ? Math.round((correctQ / totalQ) * 100) : 0;
+        currentTopicEditing.errorNote = errorNote;
+
+        saveData();
+        closeModal();
+        renderSyllabus();
+        renderDashboard();
+        renderSRS();
+    }
+
+    /* --- 6. ALGORITMO SRS ADAPTATIVO (UNESP TOP 20) --- */
+    function renderSRS() {
+        const container = document.getElementById('srs-container');
+        container.innerHTML = '';
+
         const todayStart = new Date();
         todayStart.setHours(0,0,0,0);
         const todayMs = todayStart.getTime();
 
-        // Calcular a próxima data de revisão para CADA tópico concluído
+        let srsItems =[];
+
         appData.topics.forEach(t => {
             if (t.completed && t.completedAt) {
                 const compStart = new Date(t.completedAt);
                 compStart.setHours(0,0,0,0);
-                const compMs = compStart.getTime();
+                const daysPassed = Math.floor((todayMs - compStart.getTime()) / 86400000);
                 
-                // Diferença em dias desde que foi estudado
-                const daysPassed = Math.floor((todayMs - compMs) / 86400000);
-                const milestones = [1, 7, 15, 30];
-                let nextMilestone = null;
+                // LÓGICA DE PRIORIZAÇÃO ADAPTATIVA
+                let intervals = [1, 7, 15, 30]; // Curva Padrão
 
-                // Descobre qual é a próxima janela de revisão que ainda não passou
-                for (let m of milestones) {
-                    if (daysPassed < m) {
-                        nextMilestone = m;
-                        break;
+                if (t.isTop20 && t.totalQ > 0) {
+                    if (t.score < 70) {
+                        // Reforço! Adianta a primeira revisão para 3 dias.
+                        intervals = [3, 7, 15, 30]; 
+                    } else if (t.score > 90) {
+                        // Espaçamento otimizado! Pula o 1º dia, vai direto pra 15.
+                        intervals =[15, 30, 45, 60]; 
                     }
                 }
 
-                // Se houver uma próxima revisão (não passou dos 30 dias)
-                if (nextMilestone !== null) {
-                    const nextDateMs = compMs + (nextMilestone * 86400000);
-                    const daysRemaining = Math.floor((nextDateMs - todayMs) / 86400000);
-                    
-                    upcoming.push({
+                // Verifica se o dia atual cai em algum intervalo
+                let isDueToday = intervals.includes(daysPassed);
+                let nextInterval = intervals.find(i => i > daysPassed);
+
+                if (isDueToday || nextInterval) {
+                    srsItems.push({
                         topic: t,
-                        milestone: nextMilestone,
-                        dateMs: nextDateMs,
-                        daysRemaining: daysRemaining
+                        isDueToday: isDueToday,
+                        daysToNext: nextInterval ? (nextInterval - daysPassed) : null
                     });
                 }
             }
         });
 
-        // Ordenar do mais próximo para o mais distante
-        upcoming.sort((a, b) => a.dateMs - b.dateMs);
-
-        if (upcoming.length === 0) {
-            listContainer.innerHTML = `<div class="empty-state">Nenhuma revisão futura agendada. Marque temas como concluídos no Edital.</div>`;
-            return;
-        }
-
-        // Limitar exibição aos próximos 5 eventos para não poluir
-        const topUpcoming = upcoming.slice(0, 5);
-        const monthNames =["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-        topUpcoming.forEach(item => {
-            const dateObj = new Date(item.dateMs);
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            const month = monthNames[dateObj.getMonth()];
-            
-            let countdownStr = '';
-            let badgeClass = 'timeline-badge';
-            
-            if (item.daysRemaining === 0) {
-                countdownStr = 'HOJE!';
-                badgeClass += ' warning';
-            } else if (item.daysRemaining === 1) {
-                countdownStr = 'Amanhã';
-            } else {
-                countdownStr = `Daqui a ${item.daysRemaining} dias`;
-            }
-
-            const html = `
-                <div class="timeline-item">
-                    <div class="timeline-date-box">
-                        <span class="day">${day}</span>
-                        <span class="month">${month}</span>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="${badgeClass}">Revisão de ${item.milestone} Dia(s)</span>
-                        <h4>${item.topic.name}</h4>
-                        <span class="countdown-text"><i class="fa-regular fa-clock"></i> ${countdownStr}</span>
-                    </div>
-                </div>
-            `;
-            listContainer.innerHTML += html;
-        });
-    }
-
-    /* --- 7. ALERTAS SRS PARA HOJE (Aba Revisão) --- */
-    function renderSRSToday() {
-        const buckets = { 1:[], 7: [], 15:[], 30:[] };
-        let pendingTodayCount = 0;
-
-        const todayStart = new Date();
-        todayStart.setHours(0,0,0,0);
-        const todayMs = todayStart.getTime();
-
-        appData.topics.filter(t => t.completed && t.completedAt).forEach(t => {
-            const compStart = new Date(t.completedAt);
-            compStart.setHours(0,0,0,0);
-            const compMs = compStart.getTime();
-            const daysPassed = Math.floor((todayMs - compMs) / 86400000);
-            
-            if (daysPassed === 1) { buckets[1].push(t); pendingTodayCount++; }
-            if (daysPassed === 7) { buckets[7].push(t); pendingTodayCount++; }
-            if (daysPassed === 15) { buckets[15].push(t); pendingTodayCount++; }
-            if (daysPassed === 30) { buckets[30].push(t); pendingTodayCount++; }
-        });
-
-        const alertCard = document.getElementById('reviewAlert');
-        const alertText = document.getElementById('reviewAlertText');
-        if (pendingTodayCount > 0) {
-            alertCard.classList.add('active');
-            alertText.innerHTML = `Você tem <strong>${pendingTodayCount} tema(s)</strong> agendados para revisar hoje! Acesse a aba 'Revisões Hoje'.`;
-        } else {
-            alertCard.classList.remove('active');
-        }
-
-        const container = document.getElementById('srs-container');
-        container.innerHTML = '';
+        // Separar em "Hoje" e "Próximos"
+        const dueToday = srsItems.filter(i => i.isDueToday);
         
-        const renderBucket = (days, label, colorClass, icon) => {
-            const items = buckets[days];
-            if(items.length === 0) return; // Só mostra os buckets que tem algo hoje
-
-            let html = `
-                <div class="review-bucket">
-                    <h3 style="color: var(--${colorClass})">
-                        <i class="fa-solid fa-${icon}"></i> ${label} (HOJE)
-                    </h3>
-                    <ul class="topic-list">
-                        ${items.map(t => `
-                            <li class="topic-item" style="border-left: 3px solid var(--${colorClass}); padding-left: 12px; border-radius: 4px; background: var(--bg-color);">
-                                <div style="display:flex; flex-direction:column;">
-                                    <strong style="font-size: 0.9rem; color: var(--text-main);">${t.name}</strong>
-                                    <span style="font-size: 0.75rem; color: var(--text-muted);">${t.axis}</span>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            `;
-            container.innerHTML += html;
-        };
-
-        renderBucket(1, "Revisão de 1 Dia (24h)", "warning", "clock");
-        renderBucket(7, "Revisão de 7 Dias", "success", "calendar-week");
-        renderBucket(15, "Revisão de 15 Dias", "primary", "calendar-days");
-        renderBucket(30, "Revisão de 30 Dias (Mensal)", "primary-dark", "calendar-check");
-
-        if(pendingTodayCount === 0) {
-            container.innerHTML = `<div class="empty-state">Parabéns! Nenhuma revisão da curva de esquecimento agendada exatamente para a data de hoje.</div>`;
+        // Renderizar Revisões de HOJE
+        if (dueToday.length > 0) {
+            dueToday.forEach(item => {
+                const t = item.topic;
+                // Alerta de Reforço visual
+                const isReinforcement = (t.isTop20 && t.score < 70);
+                
+                container.innerHTML += `
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-left: 4px solid ${isReinforcement ? 'var(--danger)' : 'var(--primary)'}; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h4 style="color: var(--text-main); font-size: 0.95rem;">${t.name}</h4>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">${t.axis}</span>
+                            </div>
+                            ${isReinforcement ? '<span style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold;">Reforço < 70%</span>' : ''}
+                        </div>
+                        
+                        ${t.errorNote ? `
+                            <div class="recall-alert">
+                                <strong>⚠️ Active Recall (Seu Lembrete):</strong>
+                                <p>"${t.errorNote}"</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-mug-hot"></i> Nenhuma revisão agendada para hoje. Estude novos temas no Edital!</div>`;
         }
     }
 
-    /* --- 8. LÓGICA DE CRONÔMETRO --- */
+    /* --- 7. TIMERS (Integrados ao LocalStorage e Gráfico) --- */
     let activeTimerId = null;
     let timerInterval = null;
     let remainingSeconds = 0;
@@ -566,6 +602,7 @@
             activeTimerId = null;
             btn.innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
             btn.classList.remove('active');
+            saveData(); // Salva o tempo atualizado
             return;
         }
 
@@ -590,6 +627,12 @@
         timerInterval = setInterval(() => {
             remainingSeconds--;
             display.innerText = formatTime(remainingSeconds);
+            
+            // Incrementa o tempo gasto no objeto global para o Chart.js
+            appData.timeStats[id]++;
+            
+            // Atualiza o gráfico a cada 5 segundos para não pesar o navegador
+            if (remainingSeconds % 5 === 0) updateChart();
 
             if (remainingSeconds <= 0) {
                 clearInterval(timerInterval);
@@ -597,6 +640,8 @@
                 btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Reiniciar';
                 btn.classList.remove('active');
                 display.innerText = "00:00";
+                saveData();
+                updateChart();
                 playAlarm();
             }
         }, 1000);
@@ -615,11 +660,10 @@
             gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 1);
             osc.start();
             osc.stop(context.currentTime + 1);
-        } catch(e) {
-            console.log("Audio não suportado ou bloqueado.");
-        }
+        } catch(e) {}
     }
 
+    // Init App
     window.onload = init;
 
 </script>
