@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedResidency Tracker - VUNESP</title>
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================
+           1. CSS VARIABLES (Paleta Médica)
+           ========================================== */
+        :root {
+            --primary: #2b6cb0;     /* Azul Médico Principal */
+            --primary-light: #ebf8ff;
+            --primary-dark: #2c5282;
+            --secondary: #4299e1;   /* Azul Suave */
+            --accent: #3182ce;
+            --bg-color: #f7fafc;    /* Fundo Cinza/Azulado muito claro */
+            --surface: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --success: #38a169;
+            --warning: #dd6b20;
+            --warning-bg: #feebc8;
+            --danger: #e53e3e;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ==========================================
+           2. RESET & BASE
+           ========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; padding-bottom: 80px; }
+        
+        /* Container Mobile First */
+        .app-container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+        /* ==========================================
+           3. UI COMPONENTS
+           ========================================== */
+        /* Header & Progress Bar */
+        .header { margin-bottom: 24px; text-align: center; }
+        .header h1 { font-size: 1.5rem; color: var(--primary-dark); font-weight: 700; margin-bottom: 4px; }
+        .header p { font-size: 0.875rem; color: var(--text-muted); }
+        
+        .progress-container { background: var(--border); border-radius: 999px; height: 12px; overflow: hidden; margin-top: 16px; }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.4s ease; }
+        .progress-text { font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 4px; display: block; }
+
+        /* Alert Card */
+        .alert-card { background: var(--warning-bg); border-left: 4px solid var(--warning); padding: 16px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; }
+        .alert-card i { color: var(--warning); font-size: 1.25rem; }
+        .alert-card.active { display: flex; animation: slideDown 0.3s ease; }
+
+        /* Navigation Tabs */
+        .tabs { display: flex; background: var(--surface); border-radius: var(--radius); padding: 4px; margin-bottom: 24px; box-shadow: var(--shadow); }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 500; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.875rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-btn.active { background: var(--primary-light); color: var(--primary-dark); }
+        
+        /* Tab Content */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        /* Card Padronizado */
+        .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
+
+        /* Accordion (Edital) */
+        .accordion-item { border-bottom: 1px solid var(--border); }
+        .accordion-item:last-child { border-bottom: none; }
+        .accordion-header { padding: 16px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--primary-dark); }
+        .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .accordion-item.active .accordion-body { max-height: 500px; margin-bottom: 16px; }
+        .accordion-item.active .accordion-header i { transform: rotate(180deg); }
+        
+        /* Topic List */
+        .topic-list { list-style: none; }
+        .topic-item { display: flex; align-items: center; padding: 12px 0; border-top: 1px dashed var(--border); gap: 12px; }
+        .topic-item:first-child { border-top: none; }
+        .checkbox-custom { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .checkbox-custom.checked { background: var(--success); border-color: var(--success); }
+        .checkbox-custom.checked i { display: block; color: white; font-size: 12px; }
+        .checkbox-custom i { display: none; }
+        .topic-name { font-size: 0.95rem; flex: 1; transition: 0.2s; }
+        .topic-item.completed .topic-name { text-decoration: line-through; color: var(--text-muted); }
+
+        /* Timers (Sessão de Estudo) */
+        .timer-card { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; gap: 12px; }
+        .timer-header { display: flex; justify-content: space-between; width: 100%; align-items: center; font-weight: 600; color: var(--primary-dark); }
+        .timer-badge { background: var(--primary-light); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+        .timer-display { font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-main); margin: 8px 0; }
+        .btn-play { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-play:hover { background: var(--primary-dark); }
+        .btn-play.active { background: var(--warning); }
+        
+        /* Review Calendar */
+        .review-bucket { margin-bottom: 24px; }
+        .review-bucket h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--primary-light); padding-bottom: 4px; }
+        .empty-state { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 12px; font-style: italic; }
+
+        /* Animacoes */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Cabeçalho & Barra de Progresso -->
+    <header class="header">
+        <h1>MedResidency VUNESP</h1>
+        <p>Protocolo Ouro de Estudos: 20/30/50</p>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <span class="progress-text" id="progressText">0% Concluído</span>
+    </header>
+
+    <!-- Alerta de Revisão (SRS) -->
+    <div class="alert-card" id="reviewAlert">
+        <i class="fa-solid fa-bell"></i>
+        <div>
+            <strong style="color: var(--text-main); display: block;">Revisões Pendentes</strong>
+            <span style="font-size: 0.875rem;" id="reviewAlertText">Você tem 0 temas para revisar hoje.</span>
+        </div>
+    </div>
+
+    <!-- Navegação / Abas -->
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="switchTab('session')">
+            <i class="fa-solid fa-stopwatch"></i> Sessão
+        </button>
+        <button class="tab-btn" onclick="switchTab('syllabus')">
+            <i class="fa-solid fa-list-check"></i> Edital
+        </button>
+        <button class="tab-btn" onclick="switchTab('srs')">
+            <i class="fa-solid fa-calendar-check"></i> Revisão
+        </button>
+    </nav>
+
+    <!-- ABA 1: Sessão de Estudo (Timer 2 Horas divididas) -->
+    <main class="tab-content active" id="tab-session">
+        <div style="margin-bottom: 16px; text-align: justify; font-size: 0.875rem; color: var(--text-muted);">
+            Sessão Ouro de 2 horas. Comece pela revisão ativa do dia anterior, consuma a teoria de novos temas e dedique a maior parte do tempo à resolução de questões (banca VUNESP/UNESP).
+        </div>
+
+        <!-- Timer Revisão -->
+        <div class="timer-card">
+            <div class="timer-header">
+                <span>1. Revisão Ativa</span>
+                <span class="timer-badge">20%</span>
+            </div>
+            <div class="timer-display" id="display-review">24:00</div>
+            <button class="btn-play" id="btn-review" onclick="toggleTimer('review', 24)">
+                <i class="fa-solid fa-play"></i> Iniciar
+            </button>
+        </div>
+
+        <!-- Timer Teoria -->
+        <div class="timer-card">
+            <div class="timer-header">
+                <span>2. Teoria (Apostila/Aula)</span>
+                <span class="timer-badge">30%</span>
+            </div>
+            <div class="timer-display" id="display-theory">36:00</div>
+            <button class="btn-play" id="btn-theory" onclick="toggleTimer('theory', 36)">
+                <i class="fa-solid fa-play"></i> Iniciar
+            </button>
+        </div>
+
+        <!-- Timer Questões -->
+        <div class="timer-card">
+            <div class="timer-header">
+                <span>3. Questões VUNESP</span>
+                <span class="timer-badge">50%</span>
+            </div>
+            <div class="timer-display" id="display-questions">60:00</div>
+            <button class="btn-play" id="btn-questions" onclick="toggleTimer('questions', 60)">
+                <i class="fa-solid fa-play"></i> Iniciar
+            </button>
+        </div>
+    </main>
+
+    <!-- ABA 2: Edital & Progressão (Accordion) -->
+    <main class="tab-content" id="tab-syllabus">
+        <div class="card">
+            <div id="accordion-container">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- ABA 3: Calendário de Revisão (SRS) -->
+    <main class="tab-content" id="tab-srs">
+        <div class="card" style="margin-bottom: 12px;">
+            <p style="font-size: 0.875rem; color: var(--text-muted);">
+                A curva de esquecimento exige revisões em <strong>1, 7, 15 e 30 dias</strong>.
+                Aqui estão seus tópicos organizados pelas datas exatas de revisão.
+            </p>
+        </div>
+
+        <div id="srs-container" class="card">
+            <!-- Preenchido via JS -->
+        </div>
+    </main>
+
+</div>
+
+<!-- ==========================================
+     LÓGICA JAVASCRIPT
+     ========================================== -->
+<script>
+    /* --- 1. CONFIGURAÇÃO E DADOS MOCK (VUNESP) --- */
+    
+    // Simulação de datas para mostrar o sistema de revisão funcionando hoje
+    const today = new Date();
+    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+    const lastWeek = new Date(today); lastWeek.setDate(lastWeek.getDate() - 7);
+
+    const defaultTopics =[
+        // Eixo: Cirurgia Geral
+        { id: 1, axis: 'Cirurgia Geral', name: 'Colelitíase', completed: false, completedAt: null },
+        { id: 2, axis: 'Cirurgia Geral', name: 'Hérnias Inguinais', completed: false, completedAt: null },
+        { id: 3, axis: 'Cirurgia Geral', name: 'Trauma Abdominal (ATLS)', completed: false, completedAt: null },
+        
+        // Eixo: Clínica Médica
+        { id: 4, axis: 'Clínica Médica', name: 'Hipertensão Arterial', completed: false, completedAt: null },
+        { id: 5, axis: 'Clínica Médica', name: 'Diabetes Mellitus', completed: false, completedAt: null },
+        { id: 6, axis: 'Clínica Médica', name: 'Insuficiência Cardíaca', completed: false, completedAt: null },
+        // Item mockado como concluído há 7 dias (Para cair na revisão de 7 dias)
+        { id: 11, axis: 'Clínica Médica', name: 'Asma (DADO SIMULADO HÁ 7 DIAS)', completed: true, completedAt: lastWeek.getTime() },
+        
+        // Eixo: Preventiva
+        { id: 7, axis: 'Preventiva', name: 'Atenção Primária à Saúde', completed: false, completedAt: null },
+        { id: 8, axis: 'Preventiva', name: 'Indicadores de Saúde', completed: false, completedAt: null },
+        // Item mockado como concluído ontem (Para cair na revisão de 1 dia)
+        { id: 12, axis: 'Preventiva', name: 'SUS - Leis Orgânicas (SIMULADO ONTEM)', completed: true, completedAt: yesterday.getTime() },
+
+        // Eixo: Ginecologia e Obstetrícia
+        { id: 9, axis: 'Ginecologia e Obstetrícia', name: 'Assistência Pré-Natal', completed: false, completedAt: null },
+        
+        // Eixo: Pediatria
+        { id: 10, axis: 'Pediatria', name: 'Calendário de Imunização', completed: false, completedAt: null }
+    ];
+
+    let appData = { topics:[] };
+
+    /* --- 2. INICIALIZAÇÃO E PERSISTÊNCIA (LocalStorage) --- */
+    function init() {
+        const stored = localStorage.getItem('medResidencyVunesp');
+        if (stored) {
+            appData = JSON.parse(stored);
+            // Adicionando novos temas caso existam atualizações no defaultTopics
+            if(appData.topics.length < defaultTopics.length) {
+                appData.topics = defaultTopics; // Simplificação para reset se mexermos no mock
+                saveData();
+            }
+        } else {
+            appData.topics = defaultTopics;
+            saveData();
+        }
+
+        renderProgress();
+        renderSyllabus();
+        renderSRS();
+    }
+
+    function saveData() {
+        localStorage.setItem('medResidencyVunesp', JSON.stringify(appData));
+    }
+
+    /* --- 3. NAVEGAÇÃO DE ABAS --- */
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    /* --- 4. RENDERIZAÇÃO PROGRESSO --- */
+    function renderProgress() {
+        const total = appData.topics.length;
+        const completed = appData.topics.filter(t => t.completed).length;
+        const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+        
+        document.getElementById('progressBar').style.width = percentage + '%';
+        document.getElementById('progressText').innerText = `${percentage}% do Edital Concluído`;
+    }
+
+    /* --- 5. RENDERIZAÇÃO EDITAL (Accordion) --- */
+    function renderSyllabus() {
+        const container = document.getElementById('accordion-container');
+        container.innerHTML = '';
+
+        // Agrupar por eixo
+        const axes = [...new Set(appData.topics.map(t => t.axis))];
+
+        axes.forEach(axis => {
+            const axisTopics = appData.topics.filter(t => t.axis === axis);
+            const completedCount = axisTopics.filter(t => t.completed).length;
+            
+            const div = document.createElement('div');
+            div.className = 'accordion-item';
+            div.innerHTML = `
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>${axis} <small style="color:var(--text-muted); font-weight:normal; margin-left:8px;">(${completedCount}/${axisTopics.length})</small></span>
+                    <i class="fa-solid fa-chevron-down" style="transition:0.3s"></i>
+                </div>
+                <div class="accordion-body">
+                    <ul class="topic-list">
+                        ${axisTopics.map(t => `
+                            <li class="topic-item ${t.completed ? 'completed' : ''}" onclick="toggleTopic(${t.id})">
+                                <div class="checkbox-custom ${t.completed ? 'checked' : ''}">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <span class="topic-name">${t.name}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleAccordion(element) {
+        const parent = element.parentElement;
+        parent.classList.toggle('active');
+    }
+
+    function toggleTopic(id) {
+        const topic = appData.topics.find(t => t.id === id);
+        topic.completed = !topic.completed;
+        topic.completedAt = topic.completed ? new Date().getTime() : null;
+        
+        saveData();
+        renderProgress();
+        renderSyllabus(); // Re-renderiza para atualizar checkbox
+        renderSRS();      // Atualiza calendário de revisão
+    }
+
+    /* --- 6. SISTEMA DE REPETIÇÃO ESPAÇADA (SRS) --- */
+    function getDaysDiff(timestamp) {
+        if(!timestamp) return -1;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const past = new Date(timestamp);
+        past.setHours(0,0,0,0);
+        const diffTime = Math.abs(today - past);
+        return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function renderSRS() {
+        const buckets = { 1: [], 7: [], 15: [], 30:[] };
+        let pendingTodayCount = 0;
+
+        appData.topics.filter(t => t.completed && t.completedAt).forEach(t => {
+            const daysPassed = getDaysDiff(t.completedAt);
+            
+            // Verifica se o dia atual coincide com as metas do algoritmo de curva de esquecimento
+            if (daysPassed === 1) { buckets[1].push(t); pendingTodayCount++; }
+            if (daysPassed === 7) { buckets[7].push(t); pendingTodayCount++; }
+            if (daysPassed === 15) { buckets[15].push(t); pendingTodayCount++; }
+            if (daysPassed === 30) { buckets[30].push(t); pendingTodayCount++; }
+        });
+
+        // Atualiza Alerta no Topo
+        const alertCard = document.getElementById('reviewAlert');
+        const alertText = document.getElementById('reviewAlertText');
+        if (pendingTodayCount > 0) {
+            alertCard.classList.add('active');
+            alertText.innerHTML = `Você tem <strong>${pendingTodayCount} tema(s)</strong> agendados para revisar hoje! Acesse a aba 'Revisão'.`;
+        } else {
+            alertCard.classList.remove('active');
+        }
+
+        // Monta o Calendário Visual
+        const container = document.getElementById('srs-container');
+        container.innerHTML = '';
+        
+        const renderBucket = (days, label, colorClass, icon) => {
+            const items = buckets[days];
+            let html = `
+                <div class="review-bucket">
+                    <h3 style="color: var(--${colorClass})">
+                        <i class="fa-solid fa-${icon}"></i> ${label}
+                    </h3>
+                    ${items.length === 0 ? `<div class="empty-state">Nenhuma revisão para esta janela temporal hoje.</div>` : ''}
+                    <ul class="topic-list">
+                        ${items.map(t => `
+                            <li class="topic-item" style="border-left: 3px solid var(--${colorClass}); padding-left: 12px; border-radius: 4px; background: var(--bg-color);">
+                                <div style="display:flex; flex-direction:column;">
+                                    <strong style="font-size: 0.9rem; color: var(--text-main);">${t.name}</strong>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">${t.axis}</span>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+            container.innerHTML += html;
+        };
+
+        renderBucket(1, "Revisão de 1 Dia (24h)", "warning", "clock");
+        renderBucket(7, "Revisão de 7 Dias", "success", "calendar-week");
+        renderBucket(15, "Revisão de 15 Dias", "primary", "calendar-days");
+        renderBucket(30, "Revisão de 30 Dias (Mensal)", "primary-dark", "calendar-check");
+    }
+
+    /* --- 7. LÓGICA DE CRONÔMETRO (Time Division) --- */
+    let activeTimerId = null;
+    let timerInterval = null;
+    let remainingSeconds = 0;
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function toggleTimer(id, defaultMinutes) {
+        const btn = document.getElementById(`btn-${id}`);
+        const display = document.getElementById(`display-${id}`);
+
+        // Se clicou em um timer que já está rodando -> Pausar
+        if (activeTimerId === id) {
+            clearInterval(timerInterval);
+            activeTimerId = null;
+            btn.innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
+            btn.classList.remove('active');
+            return;
+        }
+
+        // Se tem outro timer rodando, pausa ele primeiro
+        if (activeTimerId && activeTimerId !== id) {
+            clearInterval(timerInterval);
+            const oldBtn = document.getElementById(`btn-${activeTimerId}`);
+            oldBtn.innerHTML = '<i class="fa-solid fa-play"></i> Retomar';
+            oldBtn.classList.remove('active');
+        }
+
+        // Iniciar novo timer (ou retomar)
+        activeTimerId = id;
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+
+        // Se estiver zerado (primeira vez), define o tempo default em segundos
+        if (display.innerText === `${defaultMinutes}:00` || display.innerText === "00:00") {
+            remainingSeconds = defaultMinutes * 60;
+        } else {
+            // Retomar do texto atual (MM:SS)
+            const parts = display.innerText.split(':');
+            remainingSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        }
+
+        timerInterval = setInterval(() => {
+            remainingSeconds--;
+            display.innerText = formatTime(remainingSeconds);
+
+            if (remainingSeconds <= 0) {
+                clearInterval(timerInterval);
+                activeTimerId = null;
+                btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Reiniciar';
+                btn.classList.remove('active');
+                display.innerText = "00:00";
+                
+                // Toca um alarme simples nativo via Web Audio API
+                playAlarm();
+            }
+        }, 1000);
+    }
+
+    // Alarme sonoro simples sem dependências externas
+    function playAlarm() {
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = context.createOscillator();
+            const gainNode = context.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(context.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 800;
+            gainNode.gain.setValueAtTime(1, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 1);
+            osc.start();
+            osc.stop(context.currentTime + 1);
+        } catch(e) {
+            console.log("Audio não suportado ou bloqueado no navegador");
+        }
+    }
+
+    // Inicializa o App
+    window.onload = init;
+
+</script>
+</body>
+</html>
