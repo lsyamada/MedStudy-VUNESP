@@ -37,13 +37,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; padding-bottom: 80px; }
         
-        /* Container Mobile First */
         .app-container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
         /* ==========================================
            3. UI COMPONENTS
            ========================================== */
-        /* Header & Progress Bar */
         .header { margin-bottom: 24px; text-align: center; }
         .header h1 { font-size: 1.5rem; color: var(--primary-dark); font-weight: 700; margin-bottom: 4px; }
         .header p { font-size: 0.875rem; color: var(--text-muted); }
@@ -52,32 +50,26 @@
         .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.4s ease; }
         .progress-text { font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 4px; display: block; }
 
-        /* Alert Card */
         .alert-card { background: var(--warning-bg); border-left: 4px solid var(--warning); padding: 16px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; }
         .alert-card i { color: var(--warning); font-size: 1.25rem; }
         .alert-card.active { display: flex; animation: slideDown 0.3s ease; }
 
-        /* Navigation Tabs */
         .tabs { display: flex; background: var(--surface); border-radius: var(--radius); padding: 4px; margin-bottom: 24px; box-shadow: var(--shadow); }
         .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 500; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.875rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab-btn.active { background: var(--primary-light); color: var(--primary-dark); }
         
-        /* Tab Content */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
 
-        /* Card Padronizado */
         .card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
 
-        /* Accordion (Edital) */
         .accordion-item { border-bottom: 1px solid var(--border); }
         .accordion-item:last-child { border-bottom: none; }
         .accordion-header { padding: 16px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--primary-dark); }
         .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-        .accordion-item.active .accordion-body { max-height: 500px; margin-bottom: 16px; }
+        .accordion-item.active .accordion-body { max-height: 2000px; margin-bottom: 16px; }
         .accordion-item.active .accordion-header i { transform: rotate(180deg); }
         
-        /* Topic List */
         .topic-list { list-style: none; }
         .topic-item { display: flex; align-items: center; padding: 12px 0; border-top: 1px dashed var(--border); gap: 12px; }
         .topic-item:first-child { border-top: none; }
@@ -85,10 +77,9 @@
         .checkbox-custom.checked { background: var(--success); border-color: var(--success); }
         .checkbox-custom.checked i { display: block; color: white; font-size: 12px; }
         .checkbox-custom i { display: none; }
-        .topic-name { font-size: 0.95rem; flex: 1; transition: 0.2s; }
+        .topic-name { font-size: 0.90rem; flex: 1; transition: 0.2s; }
         .topic-item.completed .topic-name { text-decoration: line-through; color: var(--text-muted); }
 
-        /* Timers (Sessão de Estudo) */
         .timer-card { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; gap: 12px; }
         .timer-header { display: flex; justify-content: space-between; width: 100%; align-items: center; font-weight: 600; color: var(--primary-dark); }
         .timer-badge { background: var(--primary-light); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
@@ -97,12 +88,10 @@
         .btn-play:hover { background: var(--primary-dark); }
         .btn-play.active { background: var(--warning); }
         
-        /* Review Calendar */
         .review-bucket { margin-bottom: 24px; }
         .review-bucket h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--primary-light); padding-bottom: 4px; }
         .empty-state { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 12px; font-style: italic; }
 
-        /* Animacoes */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -215,7 +204,7 @@
      LÓGICA JAVASCRIPT
      ========================================== -->
 <script>
-    /* --- 1. CONFIGURAÇÃO E DADOS MOCK (VUNESP) --- */
+    /* --- 1. CONFIGURAÇÃO E DADOS ATUALIZADOS --- */
     
     // Simulação de datas para mostrar o sistema de revisão funcionando hoje
     const today = new Date();
@@ -223,43 +212,62 @@
     const lastWeek = new Date(today); lastWeek.setDate(lastWeek.getDate() - 7);
 
     const defaultTopics =[
-        // Eixo: Cirurgia Geral
-        { id: 1, axis: 'Cirurgia Geral', name: 'Colelitíase', completed: false, completedAt: null },
-        { id: 2, axis: 'Cirurgia Geral', name: 'Hérnias Inguinais', completed: false, completedAt: null },
-        { id: 3, axis: 'Cirurgia Geral', name: 'Trauma Abdominal (ATLS)', completed: false, completedAt: null },
-        
         // Eixo: Clínica Médica
-        { id: 4, axis: 'Clínica Médica', name: 'Hipertensão Arterial', completed: false, completedAt: null },
-        { id: 5, axis: 'Clínica Médica', name: 'Diabetes Mellitus', completed: false, completedAt: null },
-        { id: 6, axis: 'Clínica Médica', name: 'Insuficiência Cardíaca', completed: false, completedAt: null },
-        // Item mockado como concluído há 7 dias (Para cair na revisão de 7 dias)
-        { id: 11, axis: 'Clínica Médica', name: 'Asma (DADO SIMULADO HÁ 7 DIAS)', completed: true, completedAt: lastWeek.getTime() },
-        
-        // Eixo: Preventiva
-        { id: 7, axis: 'Preventiva', name: 'Atenção Primária à Saúde', completed: false, completedAt: null },
-        { id: 8, axis: 'Preventiva', name: 'Indicadores de Saúde', completed: false, completedAt: null },
-        // Item mockado como concluído ontem (Para cair na revisão de 1 dia)
-        { id: 12, axis: 'Preventiva', name: 'SUS - Leis Orgânicas (SIMULADO ONTEM)', completed: true, completedAt: yesterday.getTime() },
+        { id: 1, axis: 'Clínica Médica', name: 'Cardiologia: HAS (Diretriz Brasileira)', completed: false, completedAt: null },
+        { id: 2, axis: 'Clínica Médica', name: 'Cardiologia: ICC (Frações de ejeção e manejo)', completed: false, completedAt: null },
+        { id: 3, axis: 'Clínica Médica', name: 'Cardiologia: DAC estável e SCA (com e sem supra)', completed: false, completedAt: null },
+        { id: 4, axis: 'Clínica Médica', name: 'Endocrinologia: Diabetes Mellitus (Diagnóstico, manejo insulina, CAD)', completed: false, completedAt: null },
+        { id: 5, axis: 'Clínica Médica', name: 'Endocrinologia: Tireoide (Nódulos e Hipotiroidismo)', completed: false, completedAt: null },
+        { id: 6, axis: 'Clínica Médica', name: 'Nefrologia: Injúria Renal Aguda (KDIGO)', completed: false, completedAt: null },
+        { id: 7, axis: 'Clínica Médica', name: 'Nefrologia: Distúrbios Hidroeletrolíticos e Ácido-Básicos', completed: false, completedAt: null },
+        { id: 8, axis: 'Clínica Médica', name: 'Infectologia: Dengue (Manejo grupos A/B/C/D)', completed: false, completedAt: null },
+        { id: 9, axis: 'Clínica Médica', name: 'Infectologia: HIV/AIDS (PEP, PrEP e infecções oportunistas)', completed: false, completedAt: null },
+        { id: 10, axis: 'Clínica Médica', name: 'Infectologia: Antibioticoterapia comunitária', completed: false, completedAt: null },
+
+        // Eixo: Cirurgia Geral
+        { id: 11, axis: 'Cirurgia Geral', name: 'Gastro: Doença Calculosa Biliar (Colelitíase, Colecistite, Coledocolitíase)', completed: false, completedAt: null },
+        { id: 12, axis: 'Cirurgia Geral', name: 'Gastro: Pancreatite Aguda (Critérios Ranson/Atlanta)', completed: false, completedAt: null },
+        { id: 13, axis: 'Cirurgia Geral', name: 'Gastro: Doença Diverticular e Apendicite Aguda', completed: false, completedAt: null },
+        { id: 14, axis: 'Cirurgia Geral', name: 'Trauma: Avaliação primária e secundária (ATLS 10ª Ed.)', completed: false, completedAt: null },
+        { id: 15, axis: 'Cirurgia Geral', name: 'Trauma: Abdominal (indicação laparotomia) e Torácico (Pneumo/Hemotórax)', completed: false, completedAt: null },
+        { id: 16, axis: 'Cirurgia Geral', name: 'Urologia: Litíase urinária e HPB', completed: false, completedAt: null },
+        { id: 17, axis: 'Cirurgia Geral', name: 'Hérnias: Classificação de Nyhus e técnica cirúrgica', completed: false, completedAt: null },
+
+        // Eixo: Preventiva e APS
+        { id: 18, axis: 'Atenção Primária / Preventiva', name: 'Políticas: Princípios do SUS, PNH e RAS', completed: true, completedAt: yesterday.getTime() }, // MOCK: Revisão de 1 Dia
+        { id: 19, axis: 'Atenção Primária / Preventiva', name: 'Medicina de Família: Atributos APS e Método Clínico Centrado na Pessoa', completed: false, completedAt: null },
+        { id: 20, axis: 'Atenção Primária / Preventiva', name: 'Epidemiologia: Indicadores de Saúde (Mortalidade, Letalidade)', completed: false, completedAt: null },
+        { id: 21, axis: 'Atenção Primária / Preventiva', name: 'Epidemiologia: Estudos Epidemiológicos e Bioestatística (Sensib, Espec, VPP, VPN)', completed: false, completedAt: null },
+        { id: 22, axis: 'Atenção Primária / Preventiva', name: 'Saúde do Trabalhador: Notificações de acidentes e doenças ocupacionais', completed: false, completedAt: null },
 
         // Eixo: Ginecologia e Obstetrícia
-        { id: 9, axis: 'Ginecologia e Obstetrícia', name: 'Assistência Pré-Natal', completed: false, completedAt: null },
-        
+        { id: 23, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Pré-natal (Ministério da Saúde)', completed: false, completedAt: null },
+        { id: 24, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Sangramentos da 1ª (Aborto, Ectópica, Mola) e 2ª metade (DPP, PP)', completed: false, completedAt: null },
+        { id: 25, axis: 'Ginecologia e Obstetrícia', name: 'Obstetrícia: Doença Hipertensiva da Gravidez (Pré-eclâmpsia)', completed: false, completedAt: null },
+        { id: 26, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Ciclo Menstrual e SOP', completed: false, completedAt: null },
+        { id: 27, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Climatério', completed: false, completedAt: null },
+        { id: 28, axis: 'Ginecologia e Obstetrícia', name: 'Ginecologia: Câncer de Colo (Bethesda) e Câncer de Mama (BI-RADS)', completed: false, completedAt: null },
+
         // Eixo: Pediatria
-        { id: 10, axis: 'Pediatria', name: 'Calendário de Imunização', completed: false, completedAt: null }
+        { id: 29, axis: 'Pediatria', name: 'Puericultura: Crescimento, Desenvolvimento (DNPM) e Aleitamento Materno', completed: false, completedAt: null },
+        { id: 30, axis: 'Pediatria', name: 'Imunização: Calendário PNI atualizado (2025/2026)', completed: false, completedAt: null },
+        { id: 31, axis: 'Pediatria', name: 'Doenças: Infecções de vias aéreas (IVAS, OMA, Sinusite)', completed: true, completedAt: lastWeek.getTime() }, // MOCK: Revisão de 7 Dias
+        { id: 32, axis: 'Pediatria', name: 'Doenças: Diarreia e Desidratação', completed: false, completedAt: null },
+        { id: 33, axis: 'Pediatria', name: 'Doenças: Doenças Exantemáticas', completed: false, completedAt: null },
+
+        // Eixo: Urgência e Emergência
+        { id: 34, axis: 'Urgência e Emergência', name: 'Suporte de Vida: ACLS (Ritmos chocáveis/não chocáveis) e Via Aérea Difícil', completed: false, completedAt: null },
+        { id: 35, axis: 'Urgência e Emergência', name: 'Sepse: Protocolo Sepse 3 (qSOFA e conduta na primeira hora)', completed: false, completedAt: null }
     ];
 
     let appData = { topics:[] };
 
     /* --- 2. INICIALIZAÇÃO E PERSISTÊNCIA (LocalStorage) --- */
     function init() {
-        const stored = localStorage.getItem('medResidencyVunesp');
+        // Mudança na Key do LocalStorage para carregar a nova grade (v2) limpa
+        const stored = localStorage.getItem('medResidencyVunesp_v2');
         if (stored) {
             appData = JSON.parse(stored);
-            // Adicionando novos temas caso existam atualizações no defaultTopics
-            if(appData.topics.length < defaultTopics.length) {
-                appData.topics = defaultTopics; // Simplificação para reset se mexermos no mock
-                saveData();
-            }
         } else {
             appData.topics = defaultTopics;
             saveData();
@@ -271,7 +279,7 @@
     }
 
     function saveData() {
-        localStorage.setItem('medResidencyVunesp', JSON.stringify(appData));
+        localStorage.setItem('medResidencyVunesp_v2', JSON.stringify(appData));
     }
 
     /* --- 3. NAVEGAÇÃO DE ABAS --- */
@@ -299,7 +307,7 @@
         container.innerHTML = '';
 
         // Agrupar por eixo
-        const axes = [...new Set(appData.topics.map(t => t.axis))];
+        const axes =[...new Set(appData.topics.map(t => t.axis))];
 
         axes.forEach(axis => {
             const axisTopics = appData.topics.filter(t => t.axis === axis);
@@ -341,8 +349,8 @@
         
         saveData();
         renderProgress();
-        renderSyllabus(); // Re-renderiza para atualizar checkbox
-        renderSRS();      // Atualiza calendário de revisão
+        renderSyllabus(); 
+        renderSRS();      
     }
 
     /* --- 6. SISTEMA DE REPETIÇÃO ESPAÇADA (SRS) --- */
@@ -357,20 +365,18 @@
     }
 
     function renderSRS() {
-        const buckets = { 1: [], 7: [], 15: [], 30:[] };
+        const buckets = { 1:[], 7: [], 15: [], 30:[] };
         let pendingTodayCount = 0;
 
         appData.topics.filter(t => t.completed && t.completedAt).forEach(t => {
             const daysPassed = getDaysDiff(t.completedAt);
             
-            // Verifica se o dia atual coincide com as metas do algoritmo de curva de esquecimento
             if (daysPassed === 1) { buckets[1].push(t); pendingTodayCount++; }
             if (daysPassed === 7) { buckets[7].push(t); pendingTodayCount++; }
             if (daysPassed === 15) { buckets[15].push(t); pendingTodayCount++; }
             if (daysPassed === 30) { buckets[30].push(t); pendingTodayCount++; }
         });
 
-        // Atualiza Alerta no Topo
         const alertCard = document.getElementById('reviewAlert');
         const alertText = document.getElementById('reviewAlertText');
         if (pendingTodayCount > 0) {
@@ -380,7 +386,6 @@
             alertCard.classList.remove('active');
         }
 
-        // Monta o Calendário Visual
         const container = document.getElementById('srs-container');
         container.innerHTML = '';
         
@@ -428,7 +433,6 @@
         const btn = document.getElementById(`btn-${id}`);
         const display = document.getElementById(`display-${id}`);
 
-        // Se clicou em um timer que já está rodando -> Pausar
         if (activeTimerId === id) {
             clearInterval(timerInterval);
             activeTimerId = null;
@@ -437,7 +441,6 @@
             return;
         }
 
-        // Se tem outro timer rodando, pausa ele primeiro
         if (activeTimerId && activeTimerId !== id) {
             clearInterval(timerInterval);
             const oldBtn = document.getElementById(`btn-${activeTimerId}`);
@@ -445,16 +448,13 @@
             oldBtn.classList.remove('active');
         }
 
-        // Iniciar novo timer (ou retomar)
         activeTimerId = id;
         btn.classList.add('active');
         btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
 
-        // Se estiver zerado (primeira vez), define o tempo default em segundos
         if (display.innerText === `${defaultMinutes}:00` || display.innerText === "00:00") {
             remainingSeconds = defaultMinutes * 60;
         } else {
-            // Retomar do texto atual (MM:SS)
             const parts = display.innerText.split(':');
             remainingSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
         }
@@ -470,13 +470,11 @@
                 btn.classList.remove('active');
                 display.innerText = "00:00";
                 
-                // Toca um alarme simples nativo via Web Audio API
                 playAlarm();
             }
         }, 1000);
     }
 
-    // Alarme sonoro simples sem dependências externas
     function playAlarm() {
         try {
             const context = new (window.AudioContext || window.webkitAudioContext)();
